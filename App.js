@@ -6,6 +6,12 @@ import Home from "./src/pages/Home/"
 import Login from "./src/pages/Login/"
 import NewUser from "./src/pages/NewUser/"
 
+import { NativeWindStyleSheet } from "nativewind";
+
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
+
 
 const Stack = createStackNavigator()
 
