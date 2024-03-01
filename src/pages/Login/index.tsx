@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import firebase from "../../config/firebaseconfig";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { RootStackScreenProps } from "../../../navigation";
+type Props = RootStackScreenProps<"Login">;
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation }: Props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorLogin, setErrorLogin] = useState(false);
@@ -13,7 +15,7 @@ const Login = ({ navigation }) => {
         if (email === "" || password === "") {
             setErrorLogin(true);
         } else {
-            firebase.auth().signInWithEmailAndPassword(email, password)
+            /* firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     let user = userCredential.user;
                     navigation.navigate("Home", { idUser: user.uid });
@@ -23,7 +25,7 @@ const Login = ({ navigation }) => {
                 })
                 .catch(() => {
                     setErrorLogin(true);
-                });
+                }); */
         }
     };
 
@@ -51,7 +53,6 @@ const Login = ({ navigation }) => {
                     <TextInput
                         className="w-3/4 px-4 py-4 border-b-2 border-black"
                         placeholder="Enter your email"
-                        type="text"
                         onChangeText={(text) => setEmail(text)}
                         value={email}
                     />
@@ -59,7 +60,6 @@ const Login = ({ navigation }) => {
                         className="w-3/4 mt-5 px-4 py-4 border-b-2 border-black"
                         secureTextEntry={true}
                         placeholder="Enter your password"
-                        type="text"
                         onChangeText={(text) => setPassword(text)}
                         value={password}
                     />
@@ -77,7 +77,7 @@ const Login = ({ navigation }) => {
                         className="w-3/4 mt-10 bg-black rounded-full py-3 items-center justify-center"
                         onPress={loginFirebase}
                     >
-                        <Text className="text-white">Login</Text>
+                        <Text className="text-white text-bold">Login</Text>
                     </TouchableOpacity>
                     <Text className="mt-5 text-gray-600">
                         Don't have an account?{' '}

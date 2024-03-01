@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
 import firebase from "../../config/firebaseconfig";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { RootStackScreenProps } from "../../../navigation";
+type Props = RootStackScreenProps<"NewUser">;
 
-const NewUser = ({ navigation }) => {
+const NewUser = ({ navigation }: Props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorRegister, setErrorRegister] = useState(false);
@@ -17,7 +19,7 @@ const NewUser = ({ navigation }) => {
             firebase.auth().createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     let user = userCredential.user;
-                    navigation.navigate("Login", { idUser: user.uid });
+                    navigation.navigate("Login");
                     setEmail("");
                     setPassword("");
                     setErrorRegister(false);
@@ -39,7 +41,6 @@ const NewUser = ({ navigation }) => {
             <TextInput
                 className="w-64 mt-4 px-4 py-2 border-b-2 border-black"
                 placeholder="Enter your email"
-                type="text"
                 onChangeText={(text) => setEmail(text)}
                 value={email}
             />
@@ -47,7 +48,6 @@ const NewUser = ({ navigation }) => {
                 className="w-64 mt-4 px-4 py-2 border-b-2 border-black"
                 secureTextEntry={true}
                 placeholder="Enter your password"
-                type="text"
                 onChangeText={(text) => setPassword(text)}
                 value={password}
             />
