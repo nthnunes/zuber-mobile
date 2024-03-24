@@ -3,29 +3,40 @@ import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform
 import firebase from "../../config/firebaseconfig";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { RootStackScreenProps } from "../../../navigation";
+import * as Clipboard from 'expo-clipboard'
+
 type Props = RootStackScreenProps<"Login">;
 
 const Login = ({ navigation }: Props) => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [device_id, setDeviceId] = useState("");
     const [errorLogin, setErrorLogin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     const loginFirebase = () => {
-        if (email === "" || password === "") {
+        setIsLoading(true)
+        if (device_id === "") {
             setErrorLogin(true);
+            setIsLoading(false)
         } else {
-            /* firebase.auth().signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    let user = userCredential.user;
-                    navigation.navigate("Home", { idUser: user.uid });
-                    setEmail("");
-                    setPassword("");
-                    setErrorLogin(false);
+          try{
+                fetch(`http://localhost:3001/dispositivos/${device_id}`)
+                .then(response => response.json())
+                .then(data => {
+
+                    if(data.statusCode == 404){
+                         setErrorLogin(true)
+                    }
+                    if(data.id !== null){
+                        navigation.navigate("Home");
+                    }
                 })
-                .catch(() => {
-                    setErrorLogin(true);
-                }); */
+                .finally(function () {
+                    setIsLoading(false)
+                });
+          }catch(error){
+            setErrorLogin(true)
+          }
+        
         }
     };
 
@@ -50,19 +61,16 @@ const Login = ({ navigation }: Props) => {
             ) : (
                 <>
                     <Text className="text-6xl text-black mb-10 font-bold">Zuber</Text>
-                    <TextInput
-                        className="w-3/4 px-4 py-4 border-b-2 border-black"
-                        placeholder="Enter your email"
-                        onChangeText={(text) => setEmail(text)}
-                        value={email}
-                    />
-                    <TextInput
-                        className="w-3/4 mt-5 px-4 py-4 border-b-2 border-black"
-                        secureTextEntry={true}
-                        placeholder="Enter your password"
-                        onChangeText={(text) => setPassword(text)}
-                        value={password}
-                    />
+                    
+                    <TouchableOpacity className="flex">
+                        <TextInput
+                            className="w-full px-4 py-4 border-b-2 border-black"
+                            placeholder="Entre com seu código"
+                            onChangeText={(text) => setDeviceId(text)}
+                            value={device_id}
+                        />
+                    </TouchableOpacity>
+                    
                     {errorLogin ? (
                         <View className="flex-row items-center mt-5">
                             <MaterialCommunityIcons
@@ -70,7 +78,7 @@ const Login = ({ navigation }: Props) => {
                                 size={24}
                                 color="#bdbdbd"
                             />
-                            <Text className="pl-2 text-gray-400 text-lg">Invalid email or password</Text>
+                            <Text className="pl-2 text-gray-400 text-lg">Código não encontrado</Text>
                         </View>
                     ) : null}
                     <TouchableOpacity
@@ -80,12 +88,12 @@ const Login = ({ navigation }: Props) => {
                         <Text className="text-white text-bold">Login</Text>
                     </TouchableOpacity>
                     <Text className="mt-5 text-gray-600">
-                        Don't have an account?{' '}
+                        Você já tem uma conta?{' '}
                         <Text
                             className="text-blue-500"
                             onPress={() => navigation.navigate("NewUser")}
                         >
-                            Sign Up!
+                           Cadastre-se
                         </Text>
                     </Text>
                     <View className="h-24"></View>

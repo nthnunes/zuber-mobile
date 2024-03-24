@@ -19,6 +19,7 @@
     "@react-navigation/stack": "^6.3.16",
     "dependencies": "^0.0.1",
     "expo": "^49.0.0",
+    "expo-clipboard": "~4.3.1",
     "expo-location": "~16.1.0",
     "expo-status-bar": "~1.6.0",
     "firebase": "^9.20.0",
