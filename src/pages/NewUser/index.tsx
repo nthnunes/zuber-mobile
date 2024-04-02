@@ -15,8 +15,6 @@ const NewUser = ({ navigation }: Props) => {
     const api = `http://192.168.0.13:3001`;
 
     const registerFirebase = async () => {
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/g;
-
         if (name === "" ) {
             setErrorRegister(true);
         } else {
