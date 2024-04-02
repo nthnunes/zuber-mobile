@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
-import firebase from "../../config/firebaseconfig";
 import { MaterialCommunityIcons,AntDesign,MaterialIcons } from "@expo/vector-icons";
 import { RootStackScreenProps } from "../../../navigation";
-import * as Clipboard from 'expo-clipboard'
+import * as Clipboard from 'expo-clipboard';
 
 type Props = RootStackScreenProps<"NewUser">;
 
@@ -13,14 +12,16 @@ const NewUser = ({ navigation }: Props) => {
     const [sucessRegister, setSucessRegister] = useState(false);
     const [idDispositivo, setId] = useState("")
 
+    const api = `http://192.168.0.13:3001`;
+
     const registerFirebase = async () => {
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/g;
 
         if (name === "" ) {
             setErrorRegister(true);
         } else {
-            try {       
-                const createUser = await fetch("http://localhost:3001/dispositivos", {
+            try {
+                const createUser = await fetch(api + "/dispositivos", {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json"
