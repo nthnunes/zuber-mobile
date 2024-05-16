@@ -13,7 +13,7 @@ const Login = ({ navigation }: Props) => {
 
     const api = `http://`+ `192.168.0.138` + `:3001`;
 
-    const loginFirebase = () => {
+    const handleLogin = () => {
         setIsLoading(true)
         if (device_id === "") {
             setErrorLogin(true);
@@ -28,7 +28,7 @@ const Login = ({ navigation }: Props) => {
                          setErrorLogin(true)
                     }
                     if(data.id !== null){
-                        navigation.navigate("Home");
+                        navigation.navigate("Home", { idUser: data.id });
                         setDeviceId("");
                     }
                 })
@@ -43,12 +43,7 @@ const Login = ({ navigation }: Props) => {
     };
 
     useEffect(() => {
-        firebase.auth().onAuthStateChanged(function (user) {
-            if (user) {
-                navigation.navigate("Home", { idUser: user.uid });
-            }
-            setIsLoading(false);
-        });
+        setIsLoading(false);
     }, []);
 
     return (
@@ -85,7 +80,7 @@ const Login = ({ navigation }: Props) => {
                     ) : null}
                     <TouchableOpacity
                         className="w-3/4 mt-10 bg-black rounded-full py-3 items-center justify-center"
-                        onPress={loginFirebase}
+                        onPress={handleLogin}
                     >
                         <Text className="text-white text-bold">Login</Text>
                     </TouchableOpacity>
