@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform
 import { MaterialCommunityIcons,AntDesign,MaterialIcons } from "@expo/vector-icons";
 import { RootStackScreenProps } from "../../../navigation";
 import * as Clipboard from 'expo-clipboard';
+import Config from 'react-native-config';
 
 type Props = RootStackScreenProps<"NewUser">;
 
@@ -12,7 +13,7 @@ const NewUser = ({ navigation }: Props) => {
     const [sucessRegister, setSucessRegister] = useState(false);
     const [idDispositivo, setId] = useState("")
 
-    const api = `http://192.168.0.13:3001`;
+    const api = `http://`+ `192.168.0.138` + `:3001`;
 
     const registerFirebase = async () => {
         if (name === "" ) {

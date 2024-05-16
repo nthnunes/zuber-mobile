@@ -12,6 +12,8 @@ const Login = ({ navigation }: Props) => {
     const [errorLogin, setErrorLogin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    const api = `http://`+ `192.168.0.138` + `:3001`;
+
     const loginFirebase = () => {
         setIsLoading(true)
         if (device_id === "") {
@@ -19,7 +21,7 @@ const Login = ({ navigation }: Props) => {
             setIsLoading(false)
         } else {
           try{
-                fetch(`http://localhost:3001/dispositivos/${device_id}`)
+                fetch(`${api}/dispositivos/${device_id}`)
                 .then(response => response.json())
                 .then(data => {
 
@@ -28,6 +30,7 @@ const Login = ({ navigation }: Props) => {
                     }
                     if(data.id !== null){
                         navigation.navigate("Home");
+                        setDeviceId("");
                     }
                 })
                 .finally(function () {

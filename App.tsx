@@ -35,13 +35,13 @@ export default function App() {
             headerShown: false
           }}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="Home"
           component={Home}
           options={{
             headerShown: false
           }}
-        /> */}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
