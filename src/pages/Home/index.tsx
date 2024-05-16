@@ -20,9 +20,33 @@ const Home = ({ route }: Props) => {
     const subscriptionRef = useRef(null);
     const [sprintStatus, setSprintStatus] = useState("Iniciar corrida");
 
-    function startRace() {
+    const api = `http://`+ `192.168.0.138` + `:3001`;
+    const mqtt = `http://`+ `192.168.0.138` + `:3001`;
+
+    const createSprint = async () => {
+        try {
+            const response = await fetch(api + "/corrida/" + route.params.idUser, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                }
+            });
+            const sprintData = await response.json();
+    
+            if (sprintData.id !== null) {
+                return sprintData.id;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    
+    async function startRace() {
         if (sprintStatus == "Iniciar corrida") {
             setSprintStatus("Parar corrida");
+            const sprintId = createSprint();
+            
+            
         } else {
             setSprintStatus("Iniciar corrida");
         }
