@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform
 import firebase from "../../config/firebaseconfig";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { RootStackScreenProps } from "../../../navigation";
-import * as Clipboard from 'expo-clipboard'
 
 type Props = RootStackScreenProps<"Login">;
 
