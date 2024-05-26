@@ -15,9 +15,9 @@ import * as Paho from 'paho-mqtt';
 
 type Props = RootStackScreenProps<"Home">;
 
-const brokerUrl = `mqtt://`+ `192.168.0.138`;
+const brokerUrl = `192.168.0.138`;
 
-const client = new Paho.Client(brokerUrl, 1883, 'clientId');
+const client = new Paho.Client(brokerUrl, 8883, "clientId");
 
 const Home = ({ route }: Props) => {
     const navigation = useNavigation();
@@ -52,25 +52,39 @@ const Home = ({ route }: Props) => {
             const sprintId = await createSprint();
 
             client.connect({
-                onSuccess() {
-                  console.log('Connection established');
-                  const message = new Paho.Message(JSON.stringify({
+              onSuccess() {
+                console.log("Connection established");
+                const message = new Paho.Message(
+                  JSON.stringify({
                     lat: location.coords.latitude,
                     lon: location.coords.longitude,
-                    sprintId: sprintId
-                }));
-                  message.destinationName = 'geolocation';
-                  client.send(message);
-                },
-                onFailure(error) {
-                  console.error(error);
-                },
-              });
+                    sprintId: sprintId,
+                  })
+                );
+                message.destinationName = "geolocation";
+                client.send(message);
+
+                setInterval(() => {
+                  if (sprintStatus != "Iniciar corrida") {
+                    const message = new Paho.Message(
+                      JSON.stringify({
+                        lat: location.coords.latitude,
+                        lon: location.coords.longitude,
+                        sprintId: sprintId,
+                      })
+                    );
+                    message.destinationName = "geolocation";
+                    client.send(message);
+                  }
+                }, 30000);
+              },
+              onFailure(error) {
+                console.error(error);
+              },
+            });
         } else {
             setSprintStatus("Iniciar corrida");
-            /* client.end(false, () => {
-                console.log('Disconnected from MQTT broker.');
-            }); */
+            client.disconnect();
         }
     }
 
