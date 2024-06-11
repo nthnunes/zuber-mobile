@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
@@ -11,12 +11,12 @@ import {
 } from "expo-location";
 import { RootStackScreenProps } from "navigation";
 import * as Paho from 'paho-mqtt';
+import throttle from "lodash.throttle";
 
 
 type Props = RootStackScreenProps<"Home">;
 
 const brokerUrl = `192.168.0.138`;
-
 const client = new Paho.Client(brokerUrl, 8883, "clientId");
 
 const Home = ({ route }: Props) => {
@@ -25,8 +25,31 @@ const Home = ({ route }: Props) => {
     const mapRef = useRef(null);
     const subscriptionRef = useRef(null);
     const [sprintStatus, setSprintStatus] = useState("Iniciar corrida");
+    const [sprintId, setSprintId] = useState(null);
+    const [mqttConnected, setMqttConnected] = useState(false);
 
-    const api = `http://`+ `192.168.0.138` + `:3001`;
+    const api = `http://`+ brokerUrl + `:3001`;
+
+    const sendLocationData = useCallback(
+      throttle((_location, _sprintId) => {
+        if (mqttConnected) {
+          const message = new Paho.Message(
+            JSON.stringify({
+              lat: _location.coords.latitude,
+              lon: _location.coords.longitude,
+              sprintId: _sprintId,
+            })
+          );
+          console.log({
+            lat: _location.coords.latitude,
+            lon: _location.coords.longitude,
+          });
+          message.destinationName = "geolocation";
+          client.send(message);
+        }
+      }, 30000),
+      [mqttConnected]
+    );
 
     const createSprint = async () => {
         try {
@@ -39,7 +62,7 @@ const Home = ({ route }: Props) => {
             const sprintData = await response.json();
     
             if (sprintData.id !== null) {
-                return sprintData.id;
+                setSprintId(sprintData.id);
             }
         } catch (error) {
             console.log(error);
@@ -49,34 +72,11 @@ const Home = ({ route }: Props) => {
     async function startRace() {
         if (sprintStatus == "Iniciar corrida") {
             setSprintStatus("Parar corrida");
-            const sprintId = await createSprint();
+            await createSprint();
 
             client.connect({
               onSuccess() {
-                console.log("Connection established");
-                const message = new Paho.Message(
-                  JSON.stringify({
-                    lat: location.coords.latitude,
-                    lon: location.coords.longitude,
-                    sprintId: sprintId,
-                  })
-                );
-                message.destinationName = "geolocation";
-                client.send(message);
-
-                setInterval(() => {
-                  if (sprintStatus != "Iniciar corrida") {
-                    const message = new Paho.Message(
-                      JSON.stringify({
-                        lat: location.coords.latitude,
-                        lon: location.coords.longitude,
-                        sprintId: sprintId,
-                      })
-                    );
-                    message.destinationName = "geolocation";
-                    client.send(message);
-                  }
-                }, 30000);
+                setMqttConnected(true);
               },
               onFailure(error) {
                 console.error(error);
@@ -84,6 +84,8 @@ const Home = ({ route }: Props) => {
             });
         } else {
             setSprintStatus("Iniciar corrida");
+            setSprintId(null);
+            setMqttConnected(false);
             client.disconnect();
         }
     }
@@ -131,13 +133,19 @@ const Home = ({ route }: Props) => {
             timeInterval: 1000,
             distanceInterval: 1,
         }, (response) => {
-            console.log(response);
+            //console.log(response);
             setLocation(response);
             mapRef.current?.animateCamera({ center: response.coords });
         });
 
         return () => subscriptionRef.current && subscriptionRef.current.remove();
     }, []);
+
+    useEffect(() => {
+        if (sprintStatus != "Iniciar corrida" && sprintId && mqttConnected) {
+            sendLocationData(location, sprintId);
+        }
+    }, [location, sprintId, mqttConnected]);
 
     return (    
         <View className="flex-1">
